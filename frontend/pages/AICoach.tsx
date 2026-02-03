@@ -150,16 +150,16 @@ export default function AICoach() {
         </div>
 
         <Tabs defaultValue="schedule" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="schedule">
+          <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 h-auto gap-2">
+            <TabsTrigger value="schedule" className="py-3 md:py-1.5">
               <Calendar className="w-4 h-4 mr-2" />
               Smart Schedule
             </TabsTrigger>
-            <TabsTrigger value="productivity">
+            <TabsTrigger value="productivity" className="py-3 md:py-1.5">
               <TrendingUp className="w-4 h-4 mr-2" />
               Productivity
             </TabsTrigger>
-            <TabsTrigger value="burnout">
+            <TabsTrigger value="burnout" className="py-3 md:py-1.5">
               <AlertTriangle className="w-4 h-4 mr-2" />
               Burnout Score
             </TabsTrigger>
@@ -328,7 +328,7 @@ export default function AICoach() {
                     </div>
 
                     {/* Metrics */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="bg-white/50 rounded-lg p-4 text-center">
                         <p className="text-3xl font-bold text-foreground">
                           {productivity.metrics.tasksCompleted}
@@ -431,7 +431,7 @@ export default function AICoach() {
                     </div>
 
                     {/* Metrics Grid */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="bg-white/50 rounded-lg p-4">
                         <p className="text-2xl font-bold text-foreground">
                           {burnout.metrics.unfinishedTasks}

@@ -84,7 +84,7 @@ export default function Dashboard() {
   const fetchSmartSchedule = async () => {
     setLoadingSchedule(true);
     try {
-      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/agent/schedule', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/ai/schedule', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
