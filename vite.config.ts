@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, "./dist/frontend"),
+    outDir: "../dist",
     emptyOutDir: true,
   },
   plugins: [react(), expressPlugin()],
