@@ -74,6 +74,7 @@ export default function Dashboard() {
       const data = await response.json();
       setTasks(Array.isArray(data) ? data : []);
     } catch (error) {
+      console.error("Fetch Tasks Error:", error);
       setTasks([]);
     } finally {
       setLoading(false);
@@ -149,7 +150,7 @@ export default function Dashboard() {
             <Badge className="premium-gradient text-white px-4 py-1.5 rounded-full border-0 font-bold mb-4 shadow-lg shadow-primary/20">
               <Sparkles className="w-3.5 h-3.5 mr-2" /> System Status: Optimized
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-black text-foreground tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
               Awaiting Command, <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">{user?.name}</span>
             </h1>
             <p className="text-xl text-muted-foreground font-medium max-w-2xl">
@@ -184,7 +185,7 @@ export default function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <p className="text-muted-foreground font-bold text-sm tracking-widest uppercase">{stat.label}</p>
-                    <div className="text-4xl font-black text-foreground">{stat.value}</div>
+                    <div className="text-2xl font-black text-foreground">{stat.value}</div>
                   </div>
                 </CardContent>
               </Card>

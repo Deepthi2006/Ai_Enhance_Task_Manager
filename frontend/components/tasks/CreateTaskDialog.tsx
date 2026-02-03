@@ -27,6 +27,12 @@ interface CreateTaskDialogProps {
   parentId?: string | null;
   projectId?: string | null;
   parentTaskName?: string | null;
+  taskToEdit?: {
+    _id: string;
+    title: string;
+    description?: string;
+    priority?: "Low" | "Medium" | "High";
+  } | null;
 }
 
 export function CreateTaskDialog({
@@ -36,13 +42,14 @@ export function CreateTaskDialog({
   parentId = null,
   projectId = null,
   parentTaskName = null,
+  taskToEdit = null,
 }: CreateTaskDialogProps) {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    priority: "Medium",
+    title: taskToEdit?.title || "",
+    description: taskToEdit?.description || "",
+    priority: taskToEdit?.priority || "Medium",
   });
   const [error, setError] = useState("");
 
@@ -58,8 +65,14 @@ export function CreateTaskDialog({
     setLoading(true);
 
     try {
-      const response = await fetch((import.meta.env.VITE_API_URL || "") + "/api/tasks", {
-        method: "POST",
+      const url = taskToEdit
+        ? (import.meta.env.VITE_API_URL || "") + `/api/tasks/${taskToEdit._id}`
+        : (import.meta.env.VITE_API_URL || "") + "/api/tasks";
+
+      const method = taskToEdit ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -82,7 +95,7 @@ export function CreateTaskDialog({
       onOpenChange(false);
       onTaskCreated();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create task");
+      setError(err instanceof Error ? err.message : "Failed to save task");
     } finally {
       setLoading(false);
     }
@@ -92,10 +105,9 @@ export function CreateTaskDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Create New Task</DialogTitle>
+          <DialogTitle>{taskToEdit ? "Edit Task" : "Create New Task"}</DialogTitle>
           <DialogDescription>
-            Add a new task to your list. AI will automatically analyze and
-            prioritize it.
+            {taskToEdit ? "Update task details." : "Add a new task to your list. AI will automatically analyze and prioritize it."}
           </DialogDescription>
           {parentTaskName && (
             <div className="mt-2 p-2 bg-primary/5 border border-primary/10 rounded text-xs font-medium text-primary">
@@ -184,7 +196,7 @@ export function CreateTaskDialog({
                   Creating...
                 </>
               ) : (
-                "Create Task"
+                taskToEdit ? "Save Changes" : "Create Task"
               )}
             </Button>
           </div>

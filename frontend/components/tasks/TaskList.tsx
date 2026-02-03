@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle2, Circle, AlertCircle, Trash2, Plus } from "lucide-react";
+import { CheckCircle2, Circle, AlertCircle, Trash2, Plus, Pencil } from "lucide-react";
 import { CreateTaskDialog } from "./CreateTaskDialog";
 
 interface Task {
@@ -33,6 +33,7 @@ export function TaskList({ tasks, onTaskUpdate, initialTasks }: TaskListProps) {
   const { token } = useAuth();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [createSubtaskOpen, setCreateSubtaskOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [activeParent, setActiveParent] = useState<{ id: string; title: string } | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -120,6 +121,19 @@ export function TaskList({ tasks, onTaskUpdate, initialTasks }: TaskListProps) {
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
+                  setEditingTask(task);
+                }}
+                className="h-8 w-8 text-blue-500 hover:bg-blue-500/10"
+                title="Edit Task"
+              >
+                <Pencil className="w-4 h-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
                   deleteTask(task._id);
                 }}
                 className="h-8 w-8 text-destructive hover:bg-destructive/10"
@@ -141,7 +155,7 @@ export function TaskList({ tasks, onTaskUpdate, initialTasks }: TaskListProps) {
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     setUpdatingId(taskId);
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
+      const response = await fetch((import.meta.env.VITE_API_URL || "") + `/api/tasks/${taskId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +178,7 @@ export function TaskList({ tasks, onTaskUpdate, initialTasks }: TaskListProps) {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
 
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
+      const response = await fetch((import.meta.env.VITE_API_URL || "") + `/api/tasks/${taskId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -223,6 +237,18 @@ export function TaskList({ tasks, onTaskUpdate, initialTasks }: TaskListProps) {
         parentId={activeParent?.id}
         parentTaskName={activeParent?.title}
       />
+
+      {editingTask && (
+        <CreateTaskDialog
+          open={!!editingTask}
+          onOpenChange={(open) => !open && setEditingTask(null)}
+          onTaskCreated={() => {
+            onTaskUpdate();
+            setEditingTask(null);
+          }}
+          taskToEdit={editingTask}
+        />
+      )}
     </div>
   );
 }
