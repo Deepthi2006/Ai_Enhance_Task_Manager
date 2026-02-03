@@ -65,7 +65,7 @@ export default function AICoach() {
   const fetchCoachingAdvice = async () => {
     setLoadingCoach(true);
     try {
-      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/agent/coach', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/ai/coach', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await response.json();
@@ -80,7 +80,7 @@ export default function AICoach() {
   const fetchSmartSchedule = async () => {
     setLoadingSchedule(true);
     try {
-      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/agent/schedule', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/ai/schedule', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -99,7 +99,7 @@ export default function AICoach() {
   const fetchProductivityScore = async () => {
     setLoadingProductivity(true);
     try {
-      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/agent/productivity-score', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/ai/productivity-score', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await response.json();
@@ -114,7 +114,7 @@ export default function AICoach() {
   const fetchBurnoutScore = async () => {
     setLoadingBurnout(true);
     try {
-      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/agent/burnout-score', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/ai/burnout-score', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await response.json();

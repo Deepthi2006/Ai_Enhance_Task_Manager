@@ -151,7 +151,7 @@ export default function Dashboard() {
               <Sparkles className="w-3.5 h-3.5 mr-2" /> System Status: Optimized
             </Badge>
             <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">
-              Awaiting Command, <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">{user?.name}</span>
+              Welcome back, <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">{user?.name}</span>
             </h1>
             <p className="text-xl text-muted-foreground font-medium max-w-2xl">
               Elevate your productivity. You have <span className="text-primary font-bold">{todoTasks.length} objectives</span> and <span className="text-blue-600 font-bold">{inProgressTasks.length} active workstreams</span>.
@@ -251,6 +251,39 @@ export default function Dashboard() {
 
                   <TabsContent value="all" className="mt-0 focus-visible:outline-none">
                     <TaskList tasks={tasks} onTaskUpdate={fetchTasks} />
+                  </TabsContent>
+
+                  <TabsContent value="todo" className="mt-0 focus-visible:outline-none">
+                    {todoTasks.length === 0 ? (
+                      <div className="text-center py-24 glass-card rounded-3xl border-dashed border-2">
+                        <Circle className="w-20 h-20 text-muted-foreground/10 mx-auto mb-6" />
+                        <p className="text-xl font-bold text-muted-foreground">All caught up! No pending tasks.</p>
+                      </div>
+                    ) : (
+                      <TaskList tasks={tasks} initialTasks={todoTasks} onTaskUpdate={fetchTasks} />
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="in-progress" className="mt-0 focus-visible:outline-none">
+                    {inProgressTasks.length === 0 ? (
+                      <div className="text-center py-24 glass-card rounded-3xl border-dashed border-2">
+                        <Zap className="w-20 h-20 text-muted-foreground/10 mx-auto mb-6" />
+                        <p className="text-xl font-bold text-muted-foreground">No active workstreams.</p>
+                      </div>
+                    ) : (
+                      <TaskList tasks={tasks} initialTasks={inProgressTasks} onTaskUpdate={fetchTasks} />
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="done" className="mt-0 focus-visible:outline-none">
+                    {doneTasks.length === 0 ? (
+                      <div className="text-center py-24 glass-card rounded-3xl border-dashed border-2">
+                        <Target className="w-20 h-20 text-muted-foreground/10 mx-auto mb-6" />
+                        <p className="text-xl font-bold text-muted-foreground">Time to ship! Complete some tasks.</p>
+                      </div>
+                    ) : (
+                      <TaskList tasks={tasks} initialTasks={doneTasks} onTaskUpdate={fetchTasks} />
+                    )}
                   </TabsContent>
 
                   <TabsContent value="schedule" className="mt-0 focus-visible:outline-none">

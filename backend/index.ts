@@ -43,7 +43,7 @@ export function createServer() {
   app.use("/api/projects", projectsRoutes);
 
   // AI routes
-  app.use("/api/agent", aiRoutes);
+  app.use("/api/ai", aiRoutes);
 
   return app;
 }

@@ -479,4 +479,95 @@ RULES:
   }
 });
 
+// POST task time estimation
+router.post('/estimate', async (req: AuthRequest, res) => {
+  try {
+    await connectDB();
+    const { title, description } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ message: "Task title is required" });
+    }
+
+    // 1. Try to find similar COMPLETED tasks by this user
+    // Simple fuzzy search using regex on title
+    const escapeRegex = (text: string) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    const firstWord = title.split(' ')[0];
+    const regex = new RegExp(escapeRegex(firstWord), 'i');
+
+    const similarTasks = await (Task as any).find({
+      assignedTo: req.user?.id,
+      status: 'Done',
+      isDeleted: false,
+      title: { $regex: regex },
+      totalTimeSpent: { $gt: 0 }
+    }).limit(10);
+
+    let estimate = 0;
+    let source = 'ai';
+    let reasoning = "";
+
+    if (similarTasks.length >= 3) {
+      // Use historical data if we have enough
+      const total = similarTasks.reduce((sum: number, t: any) => sum + t.totalTimeSpent, 0);
+      estimate = Math.round(total / similarTasks.length);
+      source = 'history';
+      reasoning = `Based on ${similarTasks.length} similar tasks you've completed.`;
+    } else {
+      // 2. Use AI if no history
+      const groqApiKey = process.env.GROQ_API_KEY;
+      if (groqApiKey) {
+        try {
+          const prompt = `Estimate the duration in minutes for this task.
+TASK: ${title}
+DETAILS: ${description || "No details"}
+
+RULES:
+- Return ONLY a JSON object: { "minutes": number, "reasoning": "short explanation" }
+- Be realistic. Coding tasks = 60-180m, Emails = 15-30m.`;
+
+          const aiResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${groqApiKey}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              model: "llama-3.3-70b-versatile",
+              messages: [{ role: "user", content: prompt }],
+              temperature: 0.1,
+              response_format: { type: "json_object" }
+            })
+          });
+
+          if (aiResponse.ok) {
+            const result: any = await aiResponse.json();
+            const content = result.choices[0].message.content;
+            const parsed = JSON.parse(content);
+            estimate = parsed.minutes || 30;
+            reasoning = parsed.reasoning || "AI estimated based on task complexity.";
+          }
+        } catch (e) {
+          console.error("AI Estimate failed:", e);
+          estimate = 30; // Fallback
+          reasoning = "Standard fallback estimate.";
+        }
+      } else {
+        // Simple fallback rules
+        estimate = 30;
+        if (title.toLowerCase().includes("project") || title.toLowerCase().includes("build")) estimate = 120;
+        if (title.toLowerCase().includes("meeting")) estimate = 60;
+        if (title.toLowerCase().includes("email") || title.toLowerCase().includes("call")) estimate = 15;
+        reasoning = "Keyword-based fallback.";
+      }
+    }
+
+    res.json({ minutes: estimate, source, reasoning });
+
+  } catch (error) {
+    console.error("Estimate error:", error);
+    res.status(500).json({ minutes: 30, source: 'fallback', reasoning: "Error calculating estimate." });
+  }
+});
+
 export default router;

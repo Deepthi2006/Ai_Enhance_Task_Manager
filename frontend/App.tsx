@@ -21,6 +21,7 @@ import AICoach from "./pages/AICoach";
 import ScheduleMeeting from "./pages/ScheduleMeeting";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import FocusMode from "./pages/FocusMode";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -107,6 +108,15 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/focus/:taskId"
+              element={
+                <ProtectedRoute>
+                  <FocusMode />
                 </ProtectedRoute>
               }
             />

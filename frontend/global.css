@@ -13,7 +13,7 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
     :root {
-        font-size: 22px;
+        font-size: 14px;
         --background: 210 40% 98%;
         --foreground: 224 71% 4%;
 
@@ -239,3 +239,37 @@
         }
     }
 }
+@layer base {
+    /* Color Themes */
+    .theme-green {
+        --primary: 142 76% 36%;
+        --primary-foreground: 355 100% 100%;
+        --ring: 142 76% 36%;
+    }
+
+    .theme-orange {
+        --primary: 24 94% 50%;
+        --primary-foreground: 60 9% 98%;
+        --ring: 24 94% 50%;
+    }
+
+    .theme-rose {
+        --primary: 343 88% 56%;
+        --primary-foreground: 355 100% 100%;
+        --ring: 343 88% 56%;
+    }
+
+    .theme-blue {
+        --primary: 221 83% 53%;
+        --primary-foreground: 210 40% 98%;
+        --ring: 221 83% 53%;
+    }
+    
+    .theme-violet {
+        /* Default values from root, just ensures specificity if needed */
+        --primary: 249 80% 54%;
+        --primary-foreground: 0 0% 100%;
+        --ring: 249 80% 54%;
+    }
+}
+

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles, Clock, BrainCircuit } from "lucide-react";
 
 interface CreateTaskDialogProps {
   open: boolean;
@@ -52,6 +52,72 @@ export function CreateTaskDialog({
     priority: taskToEdit?.priority || "Medium",
   });
   const [error, setError] = useState("");
+  const [estimatedDuration, setEstimatedDuration] = useState<{ minutes: number; source: string; reasoning: string } | null>(null);
+  const [estimating, setEstimating] = useState(false);
+
+  // Team & Assignment State
+  const [teams, setTeams] = useState<any[]>([]);
+  const [selectedTeamId, setSelectedTeamId] = useState<string>("personal");
+  const [members, setMembers] = useState<any[]>([]);
+  const [selectedAssigneeId, setSelectedAssigneeId] = useState<string>("");
+
+  useEffect(() => {
+    if (open) {
+      // Fetch teams on open
+      fetch(`${import.meta.env.VITE_API_URL || ""}/api/teams`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) setTeams(data);
+        })
+        .catch(err => console.error("Failed to fetch teams", err));
+    }
+  }, [open, token]);
+
+  useEffect(() => {
+    if (selectedTeamId && selectedTeamId !== "personal") {
+      const team = teams.find(t => t._id === selectedTeamId);
+      if (team) {
+        // Map members for the dropdown
+        const teamMembers = team.members.map((m: any) => ({
+          id: m.userId._id,
+          name: m.userId.name
+        }));
+        setMembers(teamMembers);
+        // Default to self if not already set, or keep existing
+        if (!selectedAssigneeId) {
+          // We might want to default to current user, but for now let's leave blank or select first
+        }
+      }
+    } else {
+      setMembers([]);
+      setSelectedAssigneeId("");
+    }
+  }, [selectedTeamId, teams]);
+
+  const fetchEstimate = async () => {
+    if (!formData.title) return;
+    setEstimating(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/ai/estimate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title: formData.title, description: formData.description }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setEstimatedDuration(data);
+      }
+    } catch (err) {
+      console.error("Estimate failed", err);
+    } finally {
+      setEstimating(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,6 +149,8 @@ export function CreateTaskDialog({
           priority: formData.priority,
           parentId,
           projectId,
+          teamId: selectedTeamId === "personal" ? null : selectedTeamId,
+          assignedTo: selectedAssigneeId || undefined
         }),
       });
 
@@ -139,6 +207,33 @@ export function CreateTaskDialog({
             />
           </div>
 
+          {!estimatedDuration ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={fetchEstimate}
+              disabled={!formData.title || estimating}
+              className="text-xs text-primary hover:bg-primary/5 h-8 w-full justify-start pl-0 gap-2"
+            >
+              {estimating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+              {estimating ? "Calculating estimate..." : "Get AI Time Estimate"}
+            </Button>
+          ) : (
+            <div className="bg-primary/5 border border-primary/10 rounded-lg p-3 flex items-start gap-3">
+              <div className="bg-white p-2 rounded-md shadow-sm">
+                {estimatedDuration.source === 'history' ? <Clock className="w-4 h-4 text-blue-500" /> : <BrainCircuit className="w-4 h-4 text-purple-500" />}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-foreground">{estimatedDuration.minutes} minutes</span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-sm bg-primary/10 text-primary">{estimatedDuration.source}</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">{estimatedDuration.reasoning}</p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="description" className="text-sm font-medium">
               Description
@@ -161,7 +256,7 @@ export function CreateTaskDialog({
             </Label>
             <Select
               value={formData.priority}
-              onValueChange={(value) =>
+              onValueChange={(value: any) =>
                 setFormData({ ...formData, priority: value })
               }
             >
@@ -174,6 +269,41 @@ export function CreateTaskDialog({
                 <SelectItem value="High">High</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Team (Optional)</Label>
+              <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Select Team" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="personal">Personal (No Team)</SelectItem>
+                  {teams.map((t: any) => (
+                    <SelectItem key={t._id} value={t._id}>{t.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Assignee</Label>
+              <Select
+                value={selectedAssigneeId}
+                onValueChange={setSelectedAssigneeId}
+                disabled={selectedTeamId === 'personal'}
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder={selectedTeamId === 'personal' ? "Me" : "Select Member"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {members.map((m: any) => (
+                    <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex gap-3 justify-end pt-4">

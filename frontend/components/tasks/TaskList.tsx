@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCircle2, Circle, AlertCircle, Trash2, Plus, Pencil } from "lucide-react";
+import { CheckCircle2, Circle, AlertCircle, Trash2, Plus, Pencil, Play } from "lucide-react";
 import { CreateTaskDialog } from "./CreateTaskDialog";
 
 interface Task {
@@ -31,6 +32,7 @@ interface TaskListProps {
 
 export function TaskList({ tasks, onTaskUpdate, initialTasks }: TaskListProps) {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [createSubtaskOpen, setCreateSubtaskOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -127,6 +129,19 @@ export function TaskList({ tasks, onTaskUpdate, initialTasks }: TaskListProps) {
                 title="Edit Task"
               >
                 <Pencil className="w-4 h-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/focus/${task._id}`, { state: { task } });
+                }}
+                className="h-8 w-8 text-orange-500 hover:bg-orange-500/10"
+                title="Start Focus Mode"
+              >
+                <Play className="w-4 h-4 fill-current" />
               </Button>
 
               <Button

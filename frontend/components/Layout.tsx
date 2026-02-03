@@ -47,8 +47,8 @@ export function Layout({ children }: LayoutProps) {
         <div className="min-h-screen bg-background selection:bg-primary/20">
             {/* Header */}
             <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
-                    ? "bg-white/60 backdrop-blur-xl border-b border-white/20 py-2 shadow-lg"
-                    : "bg-transparent py-4 text-sm"
+                ? "bg-white/60 backdrop-blur-xl border-b border-white/20 py-2 shadow-lg"
+                : "bg-transparent py-4 text-sm"
                 }`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
@@ -82,8 +82,8 @@ export function Layout({ children }: LayoutProps) {
                                         key={item.path}
                                         onClick={() => navigate(item.path)}
                                         className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 group ${isActive
-                                                ? "text-white"
-                                                : "text-muted-foreground hover:text-primary hover:bg-white/50"
+                                            ? "text-white"
+                                            : "text-muted-foreground hover:text-primary hover:bg-white/50"
                                             }`}
                                     >
                                         {isActive && (
