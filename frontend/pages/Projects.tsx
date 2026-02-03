@@ -61,7 +61,7 @@ export default function Projects() {
     const fetchProjects = async () => {
         try {
             setLoading(true);
-            const response = await fetch("/api/projects", {
+            const response = await fetch((import.meta.env.VITE_API_URL || "") + "/api/projects", {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await response.json();
@@ -76,7 +76,7 @@ export default function Projects() {
     const handleCreateProject = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch("/api/projects", {
+            const response = await fetch((import.meta.env.VITE_API_URL || "") + "/api/projects", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

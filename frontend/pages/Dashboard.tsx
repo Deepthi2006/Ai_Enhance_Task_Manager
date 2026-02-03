@@ -66,7 +66,7 @@ export default function Dashboard() {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/tasks", {
+      const response = await fetch((import.meta.env.VITE_API_URL || "") + "/api/tasks", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -83,7 +83,7 @@ export default function Dashboard() {
   const fetchSmartSchedule = async () => {
     setLoadingSchedule(true);
     try {
-      const response = await fetch('/api/agent/schedule', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/agent/schedule', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

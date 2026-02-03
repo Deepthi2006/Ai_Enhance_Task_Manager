@@ -58,7 +58,7 @@ export function CreateTaskDialog({
     setLoading(true);
 
     try {
-      const response = await fetch("/api/tasks", {
+      const response = await fetch((import.meta.env.VITE_API_URL || "") + "/api/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

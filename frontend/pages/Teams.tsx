@@ -52,7 +52,7 @@ export default function Teams() {
   const fetchTeams = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/teams', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/teams', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -72,7 +72,7 @@ export default function Teams() {
 
     setCreateLoading(true);
     try {
-      const response = await fetch('/api/teams/create', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/teams/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export default function Teams() {
 
     setJoinLoading(true);
     try {
-      const response = await fetch('/api/teams/join', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/teams/join', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

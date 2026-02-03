@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
-const SOCKET_URL = window.location.origin;
+const SOCKET_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
 interface SocketEvent {
   type: string;
